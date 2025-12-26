@@ -3,9 +3,9 @@ import random
 
 GAME_WIDTH = 700
 GAME_HEIGHT = 700
-SPEED = 100
+SPEED = 125
 SPACE_SIZE = 50
-BODY_PARTS = 3
+BODY_PARTS = 2
 SNAKE_COLOR = "#00ffb8"
 FOOD_COLOR = "#e10000"
 BACKGROUND_COLOR = "#000000"
@@ -65,13 +65,16 @@ def next_turn(snake, food):
 
         del snake.squares[-1]
 
+    if check_collision(snake):
+        game_over()
+    else:
+        window.after(SPEED, next_turn, snake, food)
+
     snake.coordinates.insert(0, (x, y))
 
     square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=SNAKE_COLOR)
 
     snake.squares.insert(0, square)
-
-    window.after(SPEED, next_turn, snake, food)
 
 def change_direction(new_direction):
 
@@ -91,15 +94,26 @@ def change_direction(new_direction):
             direction = new_direction
 
 
-def check_collision():
-    pass
+def check_collision(snake):
+    x, y = snake.coordinates[0]
+    if x < 0 or x >= GAME_WIDTH:
+        return True
+    elif y < 0 or y >= GAME_HEIGHT:
+        return True
+
+    for body_part in snake.coordinates[1:]:
+        if x == body_part[0] and y == body_part[1]:
+            print("gay over")
+            return True
+
+    return False
 
 def game_over():
-    pass
+    canvas.delete(ALL)
+    canvas.create_text(canvas.winfo_width() / 2, canvas.winfo_height() / 2, font=("Arial", 100), text="GAME OVER", fill="white")
 
 window = Tk()
 window.title("Snake Game")
-window.resizable(FALSE, FALSE)
 
 score = 0
 direction = "down"
